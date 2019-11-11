@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.TimeZone;
 
 import static singlejartest.WriteToFile.writeDown;
@@ -25,8 +24,8 @@ public class GUI {
     private JTextField dateToTextField;
     private JTextField InstrumentTextField;
     private JTextField dateFromTextField;
-    private JTextField smaTimePeriodFrom;
-    private JTextField smaTimePeriodTo;
+    private JTextField ma_1;
+    private JTextField ma_2;
     private JTextArea ConsoleTextArea;
 
     public GUI() {
@@ -63,23 +62,6 @@ public class GUI {
                 // load and save opening deposit
                 TestMainRepeater.setOpeningDeposit(Integer.parseInt(startEquityTextField.getText()));
                 System.out.println("Start Equity: " + TestMainRepeater.getOpeningDeposit());
-
-                // load and save parameter increase size
-                switch (ParameterIncreaseSizeComboBox.getSelectedIndex()) {
-                    case 0:
-                        TestMainRepeater.setParameterIncreaseSize(1);
-                        break;
-                    case 1:
-                        TestMainRepeater.setParameterIncreaseSize(5);
-                        break;
-                    case 2:
-                        TestMainRepeater.setParameterIncreaseSize(10);
-                        break;
-                    case 3:
-                        TestMainRepeater.setParameterIncreaseSize(20);
-                        break;
-                }
-                System.out.println("Parameter Step Size: " + TestMainRepeater.getParameterIncreaseSize());
 
                 // load and save period
                 switch (PeriodComboBox.getSelectedIndex()) {
@@ -123,15 +105,15 @@ public class GUI {
                 System.out.println("Period: " + Exit.getMyPeriod());
 
                 // load and save sma time period FROM
-                TestMainRepeater.setSmaTimePeriodFrom(Integer.parseInt(smaTimePeriodFrom.getText()));
-                System.out.println("Parameters From: " + TestMainRepeater.getSmaTimePeriodFrom());
+                TestMainRepeater.setMa_1(Integer.parseInt(ma_1.getText())/10);
+                System.out.println("MA 1: " + TestMainRepeater.getMa_1());
 
                 // load and save sma time period TO
-                TestMainRepeater.setSmaTimePeriodTo(Integer.parseInt(smaTimePeriodTo.getText()));
-                System.out.println("Parameters To: " + TestMainRepeater.getSmaTimePeriodTo());
+                TestMainRepeater.setMa_2(Integer.parseInt(ma_2.getText())/10);
+                System.out.println("MA 2: " + TestMainRepeater.getMa_2());
 
                 // store new dateFrom
-                TestMainRepeater.setSmaTimePeriod(Integer.parseInt(smaTimePeriodFrom.getText()));
+                TestMainRepeater.setMaActual_1(Integer.parseInt(ma_1.getText()));
 
                 // create new file clean old
                 WriteToFile.startFile();
@@ -141,20 +123,20 @@ public class GUI {
                 // clean console text area
                 ConsoleTextArea.selectAll();
                 ConsoleTextArea.replaceSelection("");
-                ConsoleTextArea.append("smaTimePeriod\tFinal equity\t\tOrders");
+                ConsoleTextArea.append("MA 1\tMA 2\tFinal equity\tOrders");
 
-                //count number of tests and initialize TestMainRepeater.equitiesStorage
-                int numOfTests = 0;
-                for(int i = TestMainRepeater.getSmaTimePeriodFrom();
-                    i < TestMainRepeater.getSmaTimePeriodTo();
-                    i += TestMainRepeater.getParameterIncreaseSize()){
-                    numOfTests++;
-                }
 
-                for (int i = 0; i < numOfTests+1; i++) {
-                    ArrayList<Double> a = new ArrayList<>();
-                    TestMainRepeater.getEquitiesStorage().add(a);
-                }
+
+
+                // get list of parameters
+                TestMainRepeater.refreshListOfParameters();
+
+
+                // get list of parameters
+                TestMainRepeater.setListOfParameters(
+                        SMACrossListGenerator.listOfParameters(
+                                TestMainRepeater.getMa_1(), TestMainRepeater.getMa_2()));
+
 
                 // start test
                 try {
@@ -351,24 +333,24 @@ public class GUI {
         gbc.gridx = 0;
         gbc.gridy = 5;
         panel1.add(label8, gbc);
-        smaTimePeriodFrom = new JTextField();
-        smaTimePeriodFrom.setText("50");
+        ma_1 = new JTextField();
+        ma_1.setText("50");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel1.add(smaTimePeriodFrom, gbc);
-        smaTimePeriodTo = new JTextField();
-        smaTimePeriodTo.setText("150");
+        panel1.add(ma_1, gbc);
+        ma_2 = new JTextField();
+        ma_2.setText("150");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
         gbc.gridy = 5;
         gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel1.add(smaTimePeriodTo, gbc);
+        panel1.add(ma_2, gbc);
         final JLabel label9 = new JLabel();
         label9.setText("-");
         gbc = new GridBagConstraints();

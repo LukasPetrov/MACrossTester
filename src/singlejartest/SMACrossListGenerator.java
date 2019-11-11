@@ -1,4 +1,4 @@
-package singlejartest.UtilityPackage;
+package singlejartest;
 
 import java.util.ArrayList;
 
@@ -6,17 +6,21 @@ public class SMACrossListGenerator {
 
     static ArrayList<Integer> AL = new ArrayList<Integer>();
     static ArrayList<Integer> BL = new ArrayList<Integer>();
+
+
+    private static int finalNumber=0;
+
     /**
      * vrati seznam parametru pro testovani strategie krizeni klouzavych
-     * prumeru (sma1:sma2), kombinace parametru pro sma1 a sma2 se neopakuje a to ani
+     * prumeru (ma1:ma2), kombinace parametru pro sma1 a sma2 se neopakuje a to ani
      * invertovane (1:2 a 2:1), a nejsou totozne (5:5)
      *
      * @param param1I sma fast ranges
      * @param param2I sma slow ranges
-     * @return list of parameters for sma1 and sma2 in 2d array
+     * @return list of parameters for ma1 and ma2 in 2d array
      */
-    public static int[][] listOfParameters(int param1I, int param2I){
-        int finalNumber=0;
+    public static ArrayList<ArrayList<Integer>> listOfParameters(int param1I, int param2I){
+        finalNumber=0;
 
         int param1 = param1I;
         int param2 = param2I;
@@ -61,19 +65,22 @@ public class SMACrossListGenerator {
         System.out.println(BL);
         System.out.println("final Number is: " + finalNumber);
 
-        return createArray(AL,BL);
-    }
 
-    /** join two arrays and return two dimensional array of all parameters*/
-    public static int[][] createArray(ArrayList<Integer> a, ArrayList<Integer> b){
-        int[][] finalList = new int[2][a.size()];
-
-        for (int i = 0; i < a.size(); i++) {
-            finalList[0][i] = a.get(i);
-            finalList[1][i] = b.get(i);
+        // initialize TestMainRepeater.equitiesStorage
+        for (int i = 0; i < SMACrossListGenerator.getFinalNumber()+1; i++) {
+            ArrayList<Double> a = new ArrayList<>();
+            TestMainRepeater.getEquitiesStorage().add(a);
         }
+
+
+        // join two arrays and return two dimensional array of all parameters
+        ArrayList<ArrayList<Integer>> finalList = new ArrayList<>(2);
+        finalList.add(AL);
+        finalList.add(BL);
+
         return finalList;
     }
+
 
     public static int[] getColumn(int[][] array, int index){
         int[] column = new int[array.length];
@@ -83,7 +90,10 @@ public class SMACrossListGenerator {
         return column;
     }
 
+    public static int getFinalNumber() {
+        return finalNumber;
+    }
     public static void main(String[] arg) {
-        listOfParameters(20,20);
+        listOfParameters(50,50);
     }
 }

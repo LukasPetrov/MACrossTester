@@ -28,16 +28,34 @@ public class TestMainRepeater {
     private static String reportsFileLocation = "C:\\Users\\lukas\\Desktop\\Exit\\Reports\\report.html";
     private static int loopCount = 0;
     private static int openingDeposit = 1000;
-    private static int smaTimePeriodFrom = 50;
-    private static int smaTimePeriodTo = 100;
-    private static int smaTimePeriod = smaTimePeriodFrom;
+    private static int ma_1 = 100;
+    private static int ma_2 = 0;
+    private static int maActual_1 = ma_1;
+    private static int maActual_2 = 0;
     private static int parameterIncreaseSize = 10;
     public static ArrayList<ArrayList<Double>> equitiesStorage = new ArrayList<>();
 
+    public static void setListOfParameters(ArrayList<ArrayList<Integer>> listOfParameters) {
+        TestMainRepeater.listOfParameters = listOfParameters;
+    }
+
+    public static ArrayList<ArrayList<Integer>> getListOfParameters() {
+        return listOfParameters;
+    }
+
+    private static ArrayList<ArrayList<Integer>> listOfParameters = new ArrayList<>(1);
+
 
     public static void main(String[] args) {
+
+
         // start dialog and get parameters for test
         gui = new GUI();
+
+
+    }
+
+    public static void refreshListOfParameters(){
     }
 
     public static void startStrategy() throws Exception {
@@ -50,9 +68,14 @@ public class TestMainRepeater {
 
         loadData();
 
+        // set next pair of parameters
+        maActual_1 = listOfParameters.get(0).get(loopCount);
+        maActual_2 = listOfParameters.get(1).get(loopCount);
+
+
         //LOGGER.info("Starting strategy");
         // run strategy
-        client.startStrategy(new Exit(smaTimePeriod), getLoadingProgressListener());
+        client.startStrategy(new Exit(maActual_1, maActual_2), getLoadingProgressListener());
     }
 
     private static void setSystemListener() {
@@ -65,12 +88,12 @@ public class TestMainRepeater {
 
             @Override
             public void onStop(long processId) {
-                if (smaTimePeriod <= smaTimePeriodTo - parameterIncreaseSize) {
+                if (maActual_1 <= listOfParameters.get(0).size()) {
                     //LOGGER.info("Strategy started: " + processId);
                     strategyId = processId;
 
                     // loop counter
-                    TestMainRepeater.loopCount ++;
+                    loopCount ++;
 
                     // creating report
                     File reportFile = new File(reportsFileLocation);
@@ -83,8 +106,6 @@ public class TestMainRepeater {
                     //start strategy again
                     if (client.getStartedStrategies().size() == 0) {
                         try {
-                            // each new start increases the value smaTimePeriod by parameterIncreaseSize
-                            smaTimePeriod += parameterIncreaseSize;
 
                             startStrategy();
                         } catch (Exception a) {
@@ -164,28 +185,32 @@ public class TestMainRepeater {
     }
 
 
+    public static int getMaActual_2() {
+        return maActual_2;
+    }
+
     public static int getOpeningDeposit() {
         return openingDeposit;
     }
 
-    public static int getSmaTimePeriodFrom() {
-        return smaTimePeriodFrom;
+    public static int getMa_1() {
+        return ma_1;
     }
 
-    public static int getSmaTimePeriodTo() {
-        return smaTimePeriodTo;
+    public static int getMa_2() {
+        return ma_2;
     }
 
     public static void setOpeningDeposit(int openingDeposit) {
         TestMainRepeater.openingDeposit = openingDeposit;
     }
 
-    public static void setSmaTimePeriodFrom(int smaTimePeriodFrom) {
-        TestMainRepeater.smaTimePeriodFrom = smaTimePeriodFrom;
+    public static void setMa_1(int ma_1) {
+        TestMainRepeater.ma_1 = ma_1;
     }
 
-    public static void setSmaTimePeriodTo(int smaTimePeriodTo) {
-        TestMainRepeater.smaTimePeriodTo = smaTimePeriodTo;
+    public static void setMa_2(int ma_2) {
+        TestMainRepeater.ma_2 = ma_2;
     }
 
     public static Date getDateFrom() {
@@ -208,16 +233,16 @@ public class TestMainRepeater {
         TestMainRepeater.dateTo = dateTo;
     }
 
-    public static int getSmaTimePeriod() {
-        return smaTimePeriod;
+    public static int getMaActual_1() {
+        return maActual_1;
     }
 
     public static int getParameterIncreaseSize() {
         return parameterIncreaseSize;
     }
 
-    public static void setSmaTimePeriod(int smaTimePeriod) {
-        TestMainRepeater.smaTimePeriod = smaTimePeriod;
+    public static void setMaActual_1(int maActual_1) {
+        TestMainRepeater.maActual_1 = maActual_1;
     }
 
     public static void setParameterIncreaseSize(int parameterIncreaseSize) {

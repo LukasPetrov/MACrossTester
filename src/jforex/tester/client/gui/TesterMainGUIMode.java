@@ -70,7 +70,7 @@ public class TesterMainGUIMode {
                             myTesterWindow,
                             myTesterWindow,
                             getsystemListener(),
-                            new Exit(TestMainRepeater.getSmaTimePeriod()));
+                            new Exit(50, 200));
 
                 } catch (Exception e2) {
                     LOGGER.error(e2.getMessage(), e2);

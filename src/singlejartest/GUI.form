@@ -21,7 +21,7 @@
       </component>
       <component id="1fe4b" class="javax.swing.JButton" binding="startButton" default-binding="true">
         <constraints>
-          <grid row="6" column="1" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="1" row-span="1" col-span="6" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="1.0"/>
         </constraints>
         <properties>
@@ -64,15 +64,6 @@
           <text value="Start Equity"/>
         </properties>
       </component>
-      <component id="7db7c" class="javax.swing.JLabel">
-        <constraints>
-          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-          <gridbag weightx="1.0" weighty="1.0"/>
-        </constraints>
-        <properties>
-          <text value="Časový úsek"/>
-        </properties>
-      </component>
       <component id="916ee" class="javax.swing.JLabel">
         <constraints>
           <grid row="3" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -103,21 +94,6 @@
             <item value="1 Month"/>
           </model>
           <selectedIndex value="7"/>
-        </properties>
-      </component>
-      <component id="197c7" class="javax.swing.JComboBox" binding="ParameterIncreaseSizeComboBox">
-        <constraints>
-          <grid row="4" column="1" row-span="1" col-span="6" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-          <gridbag weightx="1.0" weighty="1.0"/>
-        </constraints>
-        <properties>
-          <model>
-            <item value="1 (1, 2, 3, 4, etc.)"/>
-            <item value="5 (5, 10, 15, 20, etc.)"/>
-            <item value="10 (10, 20, 30, 40, etc.)"/>
-            <item value="20 (20, 40, 60, 80, etc.)"/>
-          </model>
-          <selectedIndex value="2"/>
         </properties>
       </component>
       <component id="8c238" class="javax.swing.JTextField" binding="dateToTextField">
@@ -155,7 +131,7 @@
       </component>
       <component id="6e191" class="javax.swing.JProgressBar" binding="progressBar1" default-binding="true">
         <constraints>
-          <grid row="8" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="7" column="0" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="1.0"/>
         </constraints>
         <properties/>
@@ -173,38 +149,38 @@
       </component>
       <component id="5f78d" class="javax.swing.JLabel">
         <constraints>
-          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <text value="SMA parameters (from - to)"/>
+          <text value="MA parameters (MA1 - MA2)"/>
         </properties>
       </component>
-      <component id="7c5f5" class="javax.swing.JTextField" binding="smaTimePeriodFrom">
+      <component id="7c5f5" class="javax.swing.JTextField" binding="ma_1">
         <constraints>
-          <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="4" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <text value="50"/>
+          <text value="30"/>
         </properties>
       </component>
-      <component id="fb07e" class="javax.swing.JTextField" binding="smaTimePeriodTo">
+      <component id="fb07e" class="javax.swing.JTextField" binding="ma_2">
         <constraints>
-          <grid row="5" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="4" column="4" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <text value="150"/>
+          <text value="30"/>
         </properties>
       </component>
       <component id="d17b1" class="javax.swing.JLabel">
         <constraints>
-          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="1.0"/>
         </constraints>
         <properties>
@@ -213,7 +189,7 @@
       </component>
       <scrollpane id="5977e">
         <constraints>
-          <grid row="7" column="0" row-span="1" col-span="7" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="6" column="0" row-span="1" col-span="7" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties/>

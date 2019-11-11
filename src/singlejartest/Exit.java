@@ -28,16 +28,22 @@ public class Exit implements IStrategy {
     public double amount = 0.001;
     public int stopLossPips = 50;
     public int takeProfitPips = 50;
-    public int breakEvenPips = 5;
+    public int breakEvenPips = 25;
     double[] sma = new double[3];
+    private int smaTimePeriod_1;
+    private int smaTimePeriod_2;
 
     // index for storing equity hiwtory, it starts by 1 because in 0 is strategy number
     public static int equityIndex = 1;
 
     //public static int smaTimePeriod = 50;
 
-    public Exit(int smaTimePeriod){
-        TestMainRepeater.setSmaTimePeriod(smaTimePeriod);
+    public Exit(int smaTimePeriod_1, int smaTimePeriod_2){
+        this.smaTimePeriod_1 = smaTimePeriod_1 * 10;
+        this.smaTimePeriod_2 = smaTimePeriod_2 * 10;
+        //TestMainRepeater.setMaActual_1(smaTimePeriod_1);
+
+        // reset orderCounter for new test
         orderCounter = 0;
     }
 
@@ -56,7 +62,8 @@ public class Exit implements IStrategy {
             return;
         }
         chart = context.getChart(myInstrument);
-        chart.add(indicators.getIndicator("SMA"), new Object[]{TestMainRepeater.getSmaTimePeriod() });
+        chart.add(indicators.getIndicator("SMA"), new Object[]{smaTimePeriod_1});
+        chart.add(indicators.getIndicator("SMA"), new Object[]{smaTimePeriod_2});
     }
 
     @Override
@@ -72,23 +79,39 @@ public class Exit implements IStrategy {
         System.out.println("COMMISION : " + submitOrder().getCommissionInUSD());
          */
 
-        newOrder(instrument, period, askBar, bidBar);
+
+
+        newOrderLogic(instrument);
 
         setBreakEvent();
 
         storeEquity(instrument);
+
+
+
+
+
     }
 
     @Override
     public void onStop() throws JFException {
+        // close all orders
+        for (IOrder order : engine.getOrders()) {
+            engine.getOrder(order.getLabel()).close();
+        }
+
         // show equity graph
         Chart chart = new Chart("SMATester", "Course of strategies");
         chart.pack( );
         RefineryUtilities.centerFrameOnScreen( chart );
         chart.setVisible( true );
 
-        WriteToFile.writeDown(String.valueOf("\n" + TestMainRepeater.getSmaTimePeriod()  + "\t\t" +getEquity()) + "\t\t" + orderCounter,true);
-        TestMainRepeater.printToConsoleTextArea("\n" + TestMainRepeater.getSmaTimePeriod()  + "\t\t" +getEquity() + "\t\t" + orderCounter);
+        WriteToFile.writeDown(String.valueOf("\n" + TestMainRepeater.getMaActual_1()  + "\t\t" +getEquity()) + "\t\t" + orderCounter,true);
+        TestMainRepeater.printToConsoleTextArea(
+                "\n" + TestMainRepeater.getMaActual_1()*10 +
+                        "\t" + TestMainRepeater.getMaActual_2()*10 +
+                        "\t" +getEquity() +
+                        "\t" + orderCounter);
         equityIndex = 1;
     }
 
@@ -103,38 +126,60 @@ public class Exit implements IStrategy {
 
     @Override
     public void onTick(Instrument instrument, ITick tick) throws JFException {
-    }
-
-    /* creating new orders logic */
-    public void newOrder(Instrument instrument, Period period, IBar askBar, IBar bidBar) throws JFException {
-        // get 2 last indicator values to detect the trend change
-        IBar prevBar = history.getBar(instrument, myPeriod, myOfferSide, 1);
-        sma[2] = sma[1];
-        sma[1] = sma[0];
-        sma[0] = indicators.sma(instrument, myPeriod, myOfferSide, AppliedPrice.CLOSE, TestMainRepeater.getSmaTimePeriod() , indicatorFilter, 1, prevBar.getTime(), 0)[0];
-        //sma[0] = indicators.sma(instrument, period, myOfferSide, AppliedPrice.CLOSE, smaTimePeriod,0);
-
-        // detect trend
-        if (sma[0] < sma[1] && sma[1] < sma[2]) { // downtrend
-            oldTrend = newTrend;
-            newTrend = false;
-        } else if (sma[0] > sma[1] && sma[1]+(sma[1]-sma[2])*2 > sma[2]){ // uptrend
-            oldTrend = newTrend;
-            newTrend = true;
+        if (!instrument.equals(myInstrument)) {
+            return;
         }
 
-        // if new trend is starting create order
-        if (oldTrend != newTrend){
-            if (newTrend == true){
-                submitOrder(OrderCommand.BUY);
-                //System.out.println("ORDER : " + submitOrder(OrderCommand.BUY).getCommissionInUSD());
-            } else {
+
+
+    }
+
+
+
+    private double [] filteredMA_1;
+    private double [] filteredMA_2;
+    private IOrder order = null;
+
+    /* creating new orders logic */
+    public void newOrderLogic(Instrument instrument) throws JFException {
+        IBar prevBar = history.getBar(instrument, myPeriod, OfferSide.BID, 1);
+        filteredMA_1 = indicators.sma(instrument, myPeriod, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
+                indicatorFilter, 2, prevBar.getTime(), 0);
+        filteredMA_2 = indicators.sma(instrument, myPeriod, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_2,
+                indicatorFilter, 2, prevBar.getTime(), 0);
+
+        // SMA10 crossover SMA90 from UP to DOWN
+        if ((filteredMA_2[1] < filteredMA_2[0]) && (filteredMA_2[1] < filteredMA_1[1]) && (filteredMA_2[0] >= filteredMA_1[0])) {
+            if (engine.getOrders().size() > 0) {
+                for (IOrder orderInMarket : engine.getOrders()) {
+                    if (orderInMarket.isLong()) {
+                        print("Closing Long position");
+                        orderInMarket.close();
+                    }
+                }
+            }
+            if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
+                print("Create SELL");
                 submitOrder(OrderCommand.SELL);
-                //System.out.println("ORDER : " + submitOrder(OrderCommand.SELL).getCommissionInUSD());
+            }
+        }
+        // SMA10 crossover SMA90 from DOWN to UP
+        if ((filteredMA_2[1] > filteredMA_2[0]) && (filteredMA_2[1] > filteredMA_1[1]) && (filteredMA_2[0] <= filteredMA_1[0])) {
+            if (engine.getOrders().size() > 0) {
+                for (IOrder orderInMarket : engine.getOrders()) {
+                    if (!orderInMarket.isLong()) {
+                        print("Closing Short position");
+                        orderInMarket.close();
+                    }
+                }
+            }
+            if ((order == null) || (!order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
+                submitOrder(OrderCommand.BUY);
             }
         }
     }
 
+    boolean dayChecker = false;
     /* at 22 oclock store equity */
     public void storeEquity(Instrument instrument) throws JFException {
         // return hour
@@ -144,13 +189,20 @@ public class Exit implements IStrategy {
         long lastTickTime = history.getLastTick(instrument).getTime();
         String hour = sdf.format(lastTickTime);
 
-        if (hour.equals("22") ){
+
+
+        if (hour.equals("22") && dayChecker == false){
+            dayChecker = true;
+            System.out.println("Balance storing");
             TestMainRepeater.getEquitiesStorage().get(TestMainRepeater.getLoopCount()).add(account.getEquity());
             equityIndex++;
+        }else if (hour.equals("23")){
+            dayChecker = false;
+
         }
     }
 
-    private void printMe(String toPrint){
+    private void print(String toPrint){
         console.getOut().println(toPrint);
     }
 

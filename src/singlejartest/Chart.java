@@ -35,8 +35,13 @@ public class Chart extends ApplicationFrame {
 
         for (int row = 0; row < equityList.size(); row++) {
             for (int col = 0; col < equityList.get(row).size(); col++) {
-                dataset.addValue(equityList.get(row).get(col), (TestMainRepeater.getSmaTimePeriodFrom()+(row+1)*10)+"strategy_"+row, Integer.toString(col));
-                //dataset.addValue(equityList.get(row).get(col), "sma_"+TestMainRepeater.getSmaTimePeriod(), Integer.toString(col));
+                dataset.addValue(equityList.get(row).get(col),
+                        TestMainRepeater.getListOfParameters().get(0).get(col)*10 + "/" + TestMainRepeater.getListOfParameters().get(1).get(col)*10+row,
+                        Integer.toString(col));
+
+
+
+                //dataset.addValue(equityList.get(row).get(col), "sma_"+TestMainRepeater.getMaActual_1(), Integer.toString(col));
                 //dataset.addValue(equityList[row][col+1], "strategy_"+row, Integer.toString(col));
                 //System.out.print(equityList[row][col] + " ");
 

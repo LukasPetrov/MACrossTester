@@ -68,7 +68,7 @@ public class WriteToFile {
         writeDownln("Start Equity:\t\t" + TestMainRepeater.getOpeningDeposit(),true);
         writeDownln("Parameter Step Size:\t" + TestMainRepeater.getParameterIncreaseSize(),true);
         writeDownln("Period:  \t\t" + Exit.getMyPeriod(),true);
-        writeDownln("Parameters From:\t" + TestMainRepeater.getSmaTimePeriodFrom(),true);
-        writeDownln("Parameters To:\t\t" + TestMainRepeater.getSmaTimePeriodTo() + "\n",true);
+        writeDownln("Parameters From:\t" + TestMainRepeater.getMa_1(),true);
+        writeDownln("Parameters To:\t\t" + TestMainRepeater.getMa_2() + "\n",true);
     }
 }
