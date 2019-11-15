@@ -201,16 +201,8 @@ public class TestMainRepeater {
         return maActual_1;
     }
 
-    public static int getParameterIncreaseSize() {
-        return parameterIncreaseSize;
-    }
-
     public static void setMaActual_1(int maActual_1) {
         TestMainRepeater.maActual_1 = maActual_1;
-    }
-
-    public static ArrayList<ArrayList<Double>> getEquitiesStorage() {
-        return equitiesStorage;
     }
 
 }

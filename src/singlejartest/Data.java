@@ -5,6 +5,7 @@ import com.dukascopy.api.Period;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Create "DataCube" which is 3D field of array lists
@@ -112,7 +113,13 @@ public class Data {
         return getData(finalDepositIndex, strategyIndex);
     }
     public static Double getDailyBalance(int strategyIndex, int dayIndex){
-        return getData(dayliBalanceIndex, strategyIndex, dayIndex);
+        return (Double) getData(dayliBalanceIndex, strategyIndex, dayIndex);
+    }
+    public static List getDailyBalance(int strategy){
+        return (List) getData(dayliBalanceIndex, strategy);
+    }
+    public static List getDailyBalance(){
+        return (List) getData(dayliBalanceIndex);
     }
     public static String getOrderName(int strategyIndex, int orderIndex){
         return getData(orderNameIndex, strategyIndex, orderIndex);

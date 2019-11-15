@@ -66,12 +66,6 @@ public class SMACrossListGenerator {
         System.out.println("final Number is: " + finalNumber);
 
 
-        // initialize TestMainRepeater.equitiesStorage
-        for (int i = 0; i < SMACrossListGenerator.getFinalNumber()+1; i++) {
-            ArrayList<Double> a = new ArrayList<>();
-            TestMainRepeater.getEquitiesStorage().add(a);
-        }
-
 
         // join two arrays and return two dimensional array of all parameters
         ArrayList<ArrayList<Integer>> finalList = new ArrayList<>(2);

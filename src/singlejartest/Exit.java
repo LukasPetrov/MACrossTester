@@ -7,8 +7,6 @@ import org.jfree.ui.RefineryUtilities;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//import static singlejartest.TestMainRepeater.smaTimePeriod;
-
 public class Exit implements IStrategy {
     private IEngine engine;
     private IConsole console;
@@ -39,8 +37,6 @@ public class Exit implements IStrategy {
     public Exit(int smaTimePeriod_1, int smaTimePeriod_2){
         this.smaTimePeriod_1 = smaTimePeriod_1 * 10;
         this.smaTimePeriod_2 = smaTimePeriod_2 * 10;
-
-        //TestMainRepeater.setMaActual_1(smaTimePeriod_1);
 
         period = Data.getPeriod();
         instrument = Data.getInstrument();
@@ -74,23 +70,11 @@ public class Exit implements IStrategy {
         if (!instrument.equals(instrument) || !period.equals(Exit.period))
             return;
 
-        /*
-        System.out.println("LOTS   : " + getAmount());
-        System.out.println("EQUITY : " + getEquity());
-        System.out.println("ORDERS : " + orderCounter);
-        System.out.println("COMMISION : " + submitOrder().getCommissionInUSD());
-         */
-
-
-
         newOrderLogic(instrument);
 
         setBreakEvent();
 
         storeEquity(instrument);
-
-
-
 
 
     }
@@ -103,7 +87,7 @@ public class Exit implements IStrategy {
         }
 
         // show equity graph
-        Chart chart = new Chart("SMATester", "Course of strategies");
+        Chart chart = new Chart("MATester", "strategies");
         chart.pack( );
         RefineryUtilities.centerFrameOnScreen( chart );
         chart.setVisible( true );
@@ -131,9 +115,6 @@ public class Exit implements IStrategy {
         if (!instrument.equals(instrument)) {
             return;
         }
-
-
-
     }
 
 
@@ -191,16 +172,13 @@ public class Exit implements IStrategy {
         long lastTickTime = history.getLastTick(instrument).getTime();
         String hour = sdf.format(lastTickTime);
 
-
-
         if (hour.equals("22") && dailyChecker == false){
             dailyChecker = true;
-            System.out.println("Balance storing");
-            TestMainRepeater.getEquitiesStorage().get(TestMainRepeater.getLoopCount()).add(account.getEquity());
+            //System.out.println("Balance storing");
+            Data.addDailyBalance(TestMainRepeater.getLoopCount(), account.getEquity());
             equityIndex++;
         }else if (hour.equals("23")){
             dailyChecker = false;
-
         }
     }
 
@@ -288,6 +266,4 @@ public class Exit implements IStrategy {
         label = label.toUpperCase();
         return label;
     }
-
-
 }
