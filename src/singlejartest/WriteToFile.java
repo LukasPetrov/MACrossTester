@@ -62,13 +62,12 @@ public class WriteToFile {
 
     public static void writeDownUserInput(){
 
-        writeDownln("Date From:\t\t" + TestMainRepeater.getDateFrom(),true);
-        writeDownln("Date To:\t\t" + TestMainRepeater.getDateTo(),true);
-        writeDownln("Instrument:\t\t" + Exit.getMyInstrument(),true);
-        writeDownln("Start Equity:\t\t" + TestMainRepeater.getOpeningDeposit(),true);
-        writeDownln("Parameter Step Size:\t" + TestMainRepeater.getParameterIncreaseSize(),true);
-        writeDownln("Period:  \t\t" + Exit.getMyPeriod(),true);
-        writeDownln("Parameters From:\t" + TestMainRepeater.getMa_1(),true);
-        writeDownln("Parameters To:\t\t" + TestMainRepeater.getMa_2() + "\n",true);
+        writeDownln("Date From:\t\t" + Data.getDateFrom(),true);
+        writeDownln("Date To:\t\t" + Data.getDateTo(),true);
+        writeDownln("Instrument:\t\t" + Data.getInstrument(),true);
+        writeDownln("Opening deposit:\t\t" + Data.getOpeningDeposit(),true);
+        writeDownln("Period:  \t\t" + Data.getPeriod(),true);
+        writeDownln("Parameters From:\t" + Data.getMa_1(),true);
+        writeDownln("Parameters To:\t\t" + Data.getMa_2() + "\n",true);
     }
 }

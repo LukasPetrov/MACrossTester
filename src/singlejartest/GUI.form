@@ -104,7 +104,7 @@
           <gridbag weightx="1.0" weighty="1.0"/>
         </constraints>
         <properties>
-          <text value="10/01/2019"/>
+          <text value="08/01/2019"/>
           <toolTipText value="dd/MM/yyyy"/>
         </properties>
       </component>

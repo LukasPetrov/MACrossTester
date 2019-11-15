@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -20,17 +19,13 @@ public class TestMainRepeater {
     private static GUI gui;
     private static long strategyId;
     private static ITesterClient client;
-    private static Date dateFrom = null;
-    private static Date dateTo = null;
     private static String jnlpUrl = "http://platform.dukascopy.com/demo/jforex.jnlp";
     private static String userName = "DEMO3TiMJp";
     private static String password = "TiMJp";
     private static String reportsFileLocation = "C:\\Users\\lukas\\Desktop\\Exit\\Reports\\report.html";
     private static int loopCount = 0;
     private static int openingDeposit = 1000;
-    private static int ma_1 = 100;
-    private static int ma_2 = 0;
-    private static int maActual_1 = ma_1;
+    private static int maActual_1 = 0;
     private static int maActual_2 = 0;
     private static int parameterIncreaseSize = 10;
     public static ArrayList<ArrayList<Double>> equitiesStorage = new ArrayList<>();
@@ -48,6 +43,7 @@ public class TestMainRepeater {
 
     public static void main(String[] args) {
 
+        Data.createDataCube();
 
         // start dialog and get parameters for test
         gui = new GUI();
@@ -64,7 +60,7 @@ public class TestMainRepeater {
         setSystemListener();
         tryToConnect();
         subscribeToInstruments();
-        client.setInitialDeposit(Exit.getMyInstrument().getSecondaryJFCurrency(), openingDeposit);
+        client.setInitialDeposit(Data.getInstrument().getSecondaryJFCurrency(), openingDeposit);
 
         loadData();
 
@@ -148,7 +144,7 @@ public class TestMainRepeater {
     private static void subscribeToInstruments() {
         //set instruments that will be used in testing
         Set<Instrument> instruments = new HashSet<>();
-        instruments.add(Exit.getMyInstrument());
+        instruments.add(Data.getInstrument());
         LOGGER.info("Subscribing instruments...");
         client.setSubscribedInstruments(instruments);
     }
@@ -157,7 +153,7 @@ public class TestMainRepeater {
         //load data
         LOGGER.info("Downloading data");
         Future<?> future = client.downloadData(null);
-        client.setDataInterval(ITesterClient.DataLoadingMethod.DIFFERENT_PRICE_TICKS, dateFrom.getTime(), dateTo.getTime());
+        client.setDataInterval(ITesterClient.DataLoadingMethod.DIFFERENT_PRICE_TICKS, Data.getDateFrom().getTime(), Data.getDateTo().getTime());
         //wait for downloading to complete
         future.get();
     }
@@ -193,44 +189,12 @@ public class TestMainRepeater {
         return openingDeposit;
     }
 
-    public static int getMa_1() {
-        return ma_1;
-    }
-
-    public static int getMa_2() {
-        return ma_2;
-    }
-
     public static void setOpeningDeposit(int openingDeposit) {
         TestMainRepeater.openingDeposit = openingDeposit;
     }
 
-    public static void setMa_1(int ma_1) {
-        TestMainRepeater.ma_1 = ma_1;
-    }
-
-    public static void setMa_2(int ma_2) {
-        TestMainRepeater.ma_2 = ma_2;
-    }
-
-    public static Date getDateFrom() {
-        return dateFrom;
-    }
-
-    public static Date getDateTo() {
-        return dateTo;
-    }
-
     public static int getLoopCount() {
         return loopCount;
-    }
-
-    public static void setDateFrom(Date dateFrom) {
-        TestMainRepeater.dateFrom = dateFrom;
-    }
-
-    public static void setDateTo(Date dateTo) {
-        TestMainRepeater.dateTo = dateTo;
     }
 
     public static int getMaActual_1() {
@@ -243,10 +207,6 @@ public class TestMainRepeater {
 
     public static void setMaActual_1(int maActual_1) {
         TestMainRepeater.maActual_1 = maActual_1;
-    }
-
-    public static void setParameterIncreaseSize(int parameterIncreaseSize) {
-        TestMainRepeater.parameterIncreaseSize = parameterIncreaseSize;
     }
 
     public static ArrayList<ArrayList<Double>> getEquitiesStorage() {

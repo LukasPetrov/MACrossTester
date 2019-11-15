@@ -46,73 +46,63 @@ public class GUI {
                 final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
                 try {
-                    TestMainRepeater.setDateFrom(dateFormat.parse(dateFromTextField.getText() + " 00:00:00"));
-                    TestMainRepeater.setDateTo(dateFormat.parse(dateToTextField.getText() + " 00:00:00"));
+                    Data.setDateFrom(dateFormat.parse(dateFromTextField.getText() + " 00:00:00"));
+                    Data.setDateTo(dateFormat.parse(dateToTextField.getText() + " 00:00:00"));
                 } catch (ParseException a) {
                     a.printStackTrace();
                 }
-                System.out.println("Date From: " + TestMainRepeater.getDateFrom());
-                System.out.println("Date To: " + TestMainRepeater.getDateTo());
-
 
                 // load and save myInstrument
-                Exit.setMyInstrument(Instrument.valueOf(InstrumentTextField.getText()));
-                System.out.println("Instrument: " + Exit.getMyInstrument());
+                Data.setInstrument(Instrument.valueOf(InstrumentTextField.getText()));
 
                 // load and save opening deposit
                 TestMainRepeater.setOpeningDeposit(Integer.parseInt(startEquityTextField.getText()));
-                System.out.println("Start Equity: " + TestMainRepeater.getOpeningDeposit());
 
                 // load and save period
                 switch (PeriodComboBox.getSelectedIndex()) {
                     case 0:
-                        Exit.setMyPeriod(Period.ONE_SEC);
+                        Data.setPeriod(Period.ONE_SEC);
                         break;
                     case 1:
-                        Exit.setMyPeriod(Period.TEN_SECS);
+                        Data.setPeriod(Period.TEN_SECS);
                         break;
                     case 2:
-                        Exit.setMyPeriod(Period.ONE_MIN);
+                        Data.setPeriod(Period.ONE_MIN);
                         break;
                     case 3:
-                        Exit.setMyPeriod(Period.FIVE_MINS);
+                        Data.setPeriod(Period.FIVE_MINS);
                         break;
                     case 4:
-                        Exit.setMyPeriod(Period.TEN_MINS);
+                        Data.setPeriod(Period.TEN_MINS);
                         break;
                     case 5:
-                        Exit.setMyPeriod(Period.FIFTEEN_MINS);
+                        Data.setPeriod(Period.FIFTEEN_MINS);
                         break;
                     case 6:
-                        Exit.setMyPeriod(Period.THIRTY_MINS);
+                        Data.setPeriod(Period.THIRTY_MINS);
                         break;
                     case 7:
-                        Exit.setMyPeriod(Period.ONE_HOUR);
+                        Data.setPeriod(Period.ONE_HOUR);
                         break;
                     case 8:
-                        Exit.setMyPeriod(Period.FOUR_HOURS);
+                        Data.setPeriod(Period.FOUR_HOURS);
                         break;
                     case 9:
-                        Exit.setMyPeriod(Period.DAILY);
+                        Data.setPeriod(Period.DAILY);
                         break;
                     case 10:
-                        Exit.setMyPeriod(Period.WEEKLY);
+                        Data.setPeriod(Period.WEEKLY);
                         break;
                     case 11:
-                        Exit.setMyPeriod(Period.MONTHLY);
+                        Data.setPeriod(Period.MONTHLY);
                         break;
                 }
-                System.out.println("Period: " + Exit.getMyPeriod());
 
-                // load and save sma time period FROM
-                TestMainRepeater.setMa_1(Integer.parseInt(ma_1.getText())/10);
-                System.out.println("MA 1: " + TestMainRepeater.getMa_1());
+                // save ma_1 and ma_2 period
+                Data.setMa_1(Short.parseShort(ma_1.getText()));
+                Data.setMa_2(Short.parseShort(ma_2.getText()));
 
-                // load and save sma time period TO
-                TestMainRepeater.setMa_2(Integer.parseInt(ma_2.getText())/10);
-                System.out.println("MA 2: " + TestMainRepeater.getMa_2());
-
-                // store new dateFrom
+                // save new dateFrom
                 TestMainRepeater.setMaActual_1(Integer.parseInt(ma_1.getText()));
 
                 // create new file clean old
@@ -125,17 +115,24 @@ public class GUI {
                 ConsoleTextArea.replaceSelection("");
                 ConsoleTextArea.append("MA 1\tMA 2\tFinal equity\tOrders");
 
-
-
-
                 // get list of parameters
                 TestMainRepeater.refreshListOfParameters();
+
+
+                System.out.println("Date From: " + Data.getDateFrom());
+                System.out.println("Date To: " + Data.getDateTo());
+                System.out.println("MA 1: " + Data.getMa_1());
+                System.out.println("MA 2: " + Data.getMa_2());
+                System.out.println("Period: " + Data.getPeriod());
+                System.out.println("Instrument: " + Data.getInstrument());
+                System.out.println("Start Equity: " + TestMainRepeater.getOpeningDeposit());
+
 
 
                 // get list of parameters
                 TestMainRepeater.setListOfParameters(
                         SMACrossListGenerator.listOfParameters(
-                                TestMainRepeater.getMa_1(), TestMainRepeater.getMa_2()));
+                                Data.getMa_1()/10, Data.getMa_2()/10));
 
 
                 // start test

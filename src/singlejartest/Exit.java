@@ -19,17 +19,15 @@ public class Exit implements IStrategy {
     private static IAccount account;
     private int counter = 0;
     private static int orderCounter = 0;
-    private static Instrument myInstrument = Instrument.EURUSD;
     private static OfferSide myOfferSide = OfferSide.BID;
-    private static Period myPeriod = Period.ONE_HOUR;
+
+    private static Instrument instrument = Instrument.EURUSD;
+    private static Period period = Period.ONE_HOUR;
     private Filter indicatorFilter = Filter.ALL_FLATS;
-    private boolean oldTrend;
-    private boolean newTrend;
     public double amount = 0.001;
     public int stopLossPips = 50;
     public int takeProfitPips = 50;
     public int breakEvenPips = 25;
-    double[] sma = new double[3];
     private int smaTimePeriod_1;
     private int smaTimePeriod_2;
 
@@ -41,7 +39,11 @@ public class Exit implements IStrategy {
     public Exit(int smaTimePeriod_1, int smaTimePeriod_2){
         this.smaTimePeriod_1 = smaTimePeriod_1 * 10;
         this.smaTimePeriod_2 = smaTimePeriod_2 * 10;
+
         //TestMainRepeater.setMaActual_1(smaTimePeriod_1);
+
+        period = Data.getPeriod();
+        instrument = Data.getInstrument();
 
         // reset orderCounter for new test
         orderCounter = 0;
@@ -61,7 +63,7 @@ public class Exit implements IStrategy {
             console.getErr().println("No chart opened!");
             return;
         }
-        chart = context.getChart(myInstrument);
+        chart = context.getChart(instrument);
         chart.add(indicators.getIndicator("SMA"), new Object[]{smaTimePeriod_1});
         chart.add(indicators.getIndicator("SMA"), new Object[]{smaTimePeriod_2});
     }
@@ -69,7 +71,7 @@ public class Exit implements IStrategy {
     @Override
     public void onBar(Instrument instrument, Period period, IBar askBar, IBar bidBar) throws JFException {
         // filter right instrument and period
-        if (!instrument.equals(myInstrument) || !period.equals(myPeriod))
+        if (!instrument.equals(instrument) || !period.equals(Exit.period))
             return;
 
         /*
@@ -126,7 +128,7 @@ public class Exit implements IStrategy {
 
     @Override
     public void onTick(Instrument instrument, ITick tick) throws JFException {
-        if (!instrument.equals(myInstrument)) {
+        if (!instrument.equals(instrument)) {
             return;
         }
 
@@ -142,10 +144,10 @@ public class Exit implements IStrategy {
 
     /* creating new orders logic */
     public void newOrderLogic(Instrument instrument) throws JFException {
-        IBar prevBar = history.getBar(instrument, myPeriod, OfferSide.BID, 1);
-        filteredMA_1 = indicators.sma(instrument, myPeriod, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
+        IBar prevBar = history.getBar(instrument, period, OfferSide.BID, 1);
+        filteredMA_1 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
                 indicatorFilter, 2, prevBar.getTime(), 0);
-        filteredMA_2 = indicators.sma(instrument, myPeriod, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_2,
+        filteredMA_2 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_2,
                 indicatorFilter, 2, prevBar.getTime(), 0);
 
         // SMA10 crossover SMA90 from UP to DOWN
@@ -179,7 +181,7 @@ public class Exit implements IStrategy {
         }
     }
 
-    boolean dayChecker = false;
+    boolean dailyChecker = false;
     /* at 22 oclock store equity */
     public void storeEquity(Instrument instrument) throws JFException {
         // return hour
@@ -191,13 +193,13 @@ public class Exit implements IStrategy {
 
 
 
-        if (hour.equals("22") && dayChecker == false){
-            dayChecker = true;
+        if (hour.equals("22") && dailyChecker == false){
+            dailyChecker = true;
             System.out.println("Balance storing");
             TestMainRepeater.getEquitiesStorage().get(TestMainRepeater.getLoopCount()).add(account.getEquity());
             equityIndex++;
         }else if (hour.equals("23")){
-            dayChecker = false;
+            dailyChecker = false;
 
         }
     }
@@ -236,7 +238,7 @@ public class Exit implements IStrategy {
     }
 
     private double getPipPrice(int pips) {
-        return pips * this.myInstrument.getPipValue();
+        return pips * instrument.getPipValue();
     }
 
     private IOrder submitOrder(IEngine.OrderCommand orderCmd) throws JFException {
@@ -247,31 +249,31 @@ public class Exit implements IStrategy {
         if (orderCmd == OrderCommand.BUY) {
 
             //console.getOut().println("BUY");
-            stopLossPrice = history.getLastTick(myInstrument).getBid() - getPipPrice(stopLossPips);
-            takeProfitPrice = history.getLastTick(myInstrument).getBid() + getPipPrice(takeProfitPips);
+            stopLossPrice = history.getLastTick(instrument).getBid() - getPipPrice(stopLossPips);
+            takeProfitPrice = history.getLastTick(instrument).getBid() + getPipPrice(takeProfitPips);
         } else {
             //console.getOut().println("SELL");
-            stopLossPrice = history.getLastTick(myInstrument).getAsk() + getPipPrice(stopLossPips);
-            takeProfitPrice = history.getLastTick(myInstrument).getAsk() - getPipPrice(takeProfitPips);
+            stopLossPrice = history.getLastTick(instrument).getAsk() + getPipPrice(stopLossPips);
+            takeProfitPrice = history.getLastTick(instrument).getAsk() - getPipPrice(takeProfitPips);
         }
 
         orderCounter++;
 
-        // Submitting an order for the specified myInstrument at the current market price
-        return engine.submitOrder(getLabel(myInstrument), myInstrument, orderCmd, getAmount(), 0, 20, stopLossPrice, takeProfitPrice);
+        // Submitting an order for the specified getInstrument at the current market price
+        return engine.submitOrder(getLabel(instrument), instrument, orderCmd, getAmount(), 0, 20, stopLossPrice, takeProfitPrice);
     }
 
     /** return amount of lots with a risk two percents */
     private double getAmount() throws JFException {
 
         // formula from internet
-        IBar bar2 = history.getBar(myInstrument, myPeriod, myOfferSide, 1);
+        IBar bar2 = history.getBar(instrument, period, myOfferSide, 1);
         double units = (((account.getEquity() * 0.01) / (1/ bar2.getClose())) / stopLossPips )  *(10000/1);
         console.getOut().println((units/100000));
 
 
         // mine formula show the same ?!?!?!
-        IBar bar = history.getBar(myInstrument, myPeriod, myOfferSide, 1);
+        IBar bar = history.getBar(instrument, period, myOfferSide, 1);
         double equityInUSD = getEquity() * bar.getClose();
         double lots = (equityInUSD * 0.01) / stopLossPips;
         // transfer microlots to lots
@@ -287,32 +289,5 @@ public class Exit implements IStrategy {
         return label;
     }
 
-    public static IIndicators getIndicators() {
-        return indicators;
-    }
-
-    public static Instrument getMyInstrument() {
-        return myInstrument;
-    }
-
-    public static OfferSide getMyOfferSide() {
-        return myOfferSide;
-    }
-
-    public static Period getMyPeriod() {
-        return myPeriod;
-    }
-
-    public Filter getIndicatorFilter() {
-        return indicatorFilter;
-    }
-
-    public static void setMyInstrument(Instrument myInstrument) {
-        Exit.myInstrument = myInstrument;
-    }
-
-    public static void setMyPeriod(Period myPeriod) {
-        Exit.myPeriod = myPeriod;
-    }
 
 }
