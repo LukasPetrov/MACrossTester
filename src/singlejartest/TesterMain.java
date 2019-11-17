@@ -70,7 +70,7 @@ public class TesterMain {
 
         LOGGER.info("Starting strategy");
 
-        client.startStrategy(new Exit(TestMainRepeater.getMaActual_1(), TestMainRepeater.getMaActual_2()), getLoadingProgressListener());
+        client.startStrategy(new Exit(TestMainRepeater.getMaActual_1(), TestMainRepeater.getMaActual_2(), false), getLoadingProgressListener());
         //now it's running
     }
 

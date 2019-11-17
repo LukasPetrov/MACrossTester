@@ -4,3 +4,5 @@
 - add trailing stop
 - GUI console change to table
 - GUI TestMainRepeater.getListOfParameters();  ???
+
+- order logic looks not working properly

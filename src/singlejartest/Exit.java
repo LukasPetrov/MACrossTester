@@ -34,12 +34,15 @@ public class Exit implements IStrategy {
 
     //public static int smaTimePeriod = 50;
 
-    public Exit(int smaTimePeriod_1, int smaTimePeriod_2){
+    public Exit(int smaTimePeriod_1, int smaTimePeriod_2, boolean GUITest){
         this.smaTimePeriod_1 = smaTimePeriod_1 * 10;
         this.smaTimePeriod_2 = smaTimePeriod_2 * 10;
 
-        period = Data.getPeriod();
-        instrument = Data.getInstrument();
+
+        if (!GUITest) {
+            period = Data.getPeriod();
+            instrument = Data.getInstrument();
+        }
 
         // reset orderCounter for new test
         orderCounter = 0;

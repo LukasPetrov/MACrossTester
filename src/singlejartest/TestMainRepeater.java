@@ -71,7 +71,7 @@ public class TestMainRepeater {
 
         //LOGGER.info("Starting strategy");
         // run strategy
-        client.startStrategy(new Exit(maActual_1, maActual_2), getLoadingProgressListener());
+        client.startStrategy(new Exit(maActual_1, maActual_2, false), getLoadingProgressListener());
     }
 
     private static void setSystemListener() {

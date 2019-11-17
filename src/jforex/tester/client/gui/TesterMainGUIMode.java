@@ -32,11 +32,9 @@ package jforex.tester.client.gui;
 import com.dukascopy.api.system.ISystemListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.dukascopy.api.Instrument;
+import singlejartest.Data;
 import singlejartest.Exit;
-import singlejartest.TestMainRepeater;
-
 import java.io.File;
 
 
@@ -53,6 +51,7 @@ public class TesterMainGUIMode {
     private static TesterClientRunner testerClientRunner;
 
     public static void main(String[] args) throws Exception {
+        Data.createDataCube();
         testerClientRunner = new TesterClientRunner();
         myTesterWindow = new MyTesterWindow(instrument, getTesterThread());
         myTesterWindow.showChartFrame();
@@ -70,7 +69,7 @@ public class TesterMainGUIMode {
                             myTesterWindow,
                             myTesterWindow,
                             getsystemListener(),
-                            new Exit(50, 200));
+                            new Exit(20, 30, true));
 
                 } catch (Exception e2) {
                     LOGGER.error(e2.getMessage(), e2);
