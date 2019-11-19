@@ -35,8 +35,14 @@ public class Exit implements IStrategy {
     //public static int smaTimePeriod = 50;
 
     public Exit(int smaTimePeriod_1, int smaTimePeriod_2, boolean GUITest){
-        this.smaTimePeriod_1 = smaTimePeriod_1 * 10;
-        this.smaTimePeriod_2 = smaTimePeriod_2 * 10;
+        // smaTimePeriod must by smaller
+        if(smaTimePeriod_1 < smaTimePeriod_2){
+            this.smaTimePeriod_1 = smaTimePeriod_1 * 10;
+            this.smaTimePeriod_2 = smaTimePeriod_2 * 10;
+        }else{
+            this.smaTimePeriod_1 = smaTimePeriod_2 * 10;
+            this.smaTimePeriod_2 = smaTimePeriod_1 * 10;
+        }
 
 
         if (!GUITest) {
@@ -73,7 +79,7 @@ public class Exit implements IStrategy {
         if (!instrument.equals(instrument) || !period.equals(Exit.period))
             return;
 
-        newOrderLogic(instrument);
+        newOrderLogic2(instrument);
 
         setBreakEvent();
 
@@ -122,20 +128,79 @@ public class Exit implements IStrategy {
 
 
 
-    private double [] filteredMA_1;
-    private double [] filteredMA_2;
+    private double [] MA_1;
+    private double [] MA_2;
     private IOrder order = null;
+
+    boolean ma1IsBiggerNew;
+    boolean ma1IsBiggerOld;
+    /* creating new orders logic */
+    public void newOrderLogic2(Instrument instrument) throws JFException {
+        IBar prevBar = history.getBar(instrument, period, OfferSide.BID, 1);
+        MA_1 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
+                indicatorFilter, 3, prevBar.getTime(), 0);
+        MA_2 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_2,
+                indicatorFilter, 3, prevBar.getTime(), 0);
+
+        // load new value
+        if (MA_1[0] > MA_2[0]) {
+            ma1IsBiggerNew = true;
+        }else{
+            ma1IsBiggerNew = false;
+        }
+        // load old value
+        if (MA_1[2] > MA_2[2]) {
+            ma1IsBiggerOld = true;
+        }else{
+            ma1IsBiggerOld = false;
+        }
+
+        if(ma1IsBiggerNew != ma1IsBiggerOld){
+
+            // SMA10 crossover SMA90 from UP to DOWN
+            if (MA_1[0] < MA_2[0]) {
+                if (engine.getOrders().size() > 0) {
+                    for (IOrder orderInMarket : engine.getOrders()) {
+                        if (orderInMarket.isLong()) {
+                            orderInMarket.close();
+                        }
+                    }
+                }
+                if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
+                    print("Create SELL");
+                    submitOrder(OrderCommand.SELL);
+                }
+                ma1IsBiggerOld = false;
+            }
+            // SMA10 crossover SMA90 from DOWN to UP
+            if (MA_1[0] > MA_2[0]) {
+                if (engine.getOrders().size() > 0) {
+                    for (IOrder orderInMarket : engine.getOrders()) {
+                        if (orderInMarket.isLong()) {
+                            orderInMarket.close();
+                        }
+                    }
+                }
+                if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
+                    print("Create BUY");
+                    submitOrder(OrderCommand.BUY);
+                }
+                ma1IsBiggerOld = true;
+            }
+
+        }
+    }
 
     /* creating new orders logic */
     public void newOrderLogic(Instrument instrument) throws JFException {
         IBar prevBar = history.getBar(instrument, period, OfferSide.BID, 1);
-        filteredMA_1 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
+        MA_1 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
                 indicatorFilter, 2, prevBar.getTime(), 0);
-        filteredMA_2 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_2,
+        MA_2 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_2,
                 indicatorFilter, 2, prevBar.getTime(), 0);
 
         // SMA10 crossover SMA90 from UP to DOWN
-        if ((filteredMA_2[1] < filteredMA_2[0]) && (filteredMA_2[1] < filteredMA_1[1]) && (filteredMA_2[0] >= filteredMA_1[0])) {
+        if ((MA_2[1] < MA_2[0]) && (MA_2[1] < MA_1[1]) && (MA_2[0] >= MA_1[0])) {
             if (engine.getOrders().size() > 0) {
                 for (IOrder orderInMarket : engine.getOrders()) {
                     if (orderInMarket.isLong()) {
@@ -150,7 +215,7 @@ public class Exit implements IStrategy {
             }
         }
         // SMA10 crossover SMA90 from DOWN to UP
-        if ((filteredMA_2[1] > filteredMA_2[0]) && (filteredMA_2[1] > filteredMA_1[1]) && (filteredMA_2[0] <= filteredMA_1[0])) {
+        if ((MA_2[1] > MA_2[0]) && (MA_2[1] > MA_1[1]) && (MA_2[0] <= MA_1[0])) {
             if (engine.getOrders().size() > 0) {
                 for (IOrder orderInMarket : engine.getOrders()) {
                     if (!orderInMarket.isLong()) {

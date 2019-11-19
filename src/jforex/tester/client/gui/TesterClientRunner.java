@@ -58,7 +58,7 @@ class TesterClientRunner {
 
         client.setSystemListener(systemListener);
         tryToConnect(jnlpUrl, userName, password);
-        setDataInterval("2019/01/01 00:00:00", "2019/02/01 00:00:00");
+        setDataInterval("2019/02/01 00:00:00", "2019/03/01 00:00:00");
         subscribeInstrument(instrument);
         downloadDataAndWaitForResult();
 
