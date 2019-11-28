@@ -88,6 +88,6 @@ public class SMACrossListGenerator {
         return finalNumber;
     }
     public static void main(String[] arg) {
-        listOfParameters(50,50);
+        listOfParameters(20,20);
     }
 }

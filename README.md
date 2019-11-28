@@ -1,8 +1,19 @@
 # To-Do List
 
+## method 1 - cross = close old / create new order
 - rename strategy name at graph gui to param1/param2
-- add trailing stop
 - GUI console change to table
-- GUI TestMainRepeater.getListOfParameters();  ???
+- store DataCube to CSV
 
-- order logic looks not working properly
+
+
+## method 2 - Break Even, Trailing Stop, Partial Close, Max risk 2%, etc.
+- add trailing stop
+
+
+
+
+
+
+
+- GUI TestMainRepeater.getListOfParameters();  ???

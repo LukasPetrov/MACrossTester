@@ -29,13 +29,8 @@ public class Exit implements IStrategy {
     private int smaTimePeriod_1;
     private int smaTimePeriod_2;
 
-    // index for storing equity hiwtory, it starts by 1 because in 0 is strategy number
-    public static int equityIndex = 1;
-
-    //public static int smaTimePeriod = 50;
-
     public Exit(int smaTimePeriod_1, int smaTimePeriod_2, boolean GUITest){
-        // smaTimePeriod must by smaller
+        // smaTimePeriod1 must by smaller than 2
         if(smaTimePeriod_1 < smaTimePeriod_2){
             this.smaTimePeriod_1 = smaTimePeriod_1 * 10;
             this.smaTimePeriod_2 = smaTimePeriod_2 * 10;
@@ -44,7 +39,7 @@ public class Exit implements IStrategy {
             this.smaTimePeriod_2 = smaTimePeriod_1 * 10;
         }
 
-
+        //  for GUI testing DataCube is not available
         if (!GUITest) {
             period = Data.getPeriod();
             instrument = Data.getInstrument();
@@ -63,6 +58,7 @@ public class Exit implements IStrategy {
         this.account = context.getAccount();
         this.indicators = context.getIndicators();
 
+        // check if chart is open if doesn't print error message if is open add indicators
         chart = context.getLastActiveChart();
         if (chart == null) {
             console.getErr().println("No chart opened!");
@@ -79,9 +75,9 @@ public class Exit implements IStrategy {
         if (!instrument.equals(instrument) || !period.equals(Exit.period))
             return;
 
-        newOrderLogic2(instrument);
+        newOrderLogic(instrument);
 
-        setBreakEvent();
+        //setBreakEvent();
 
         storeEquity(instrument);
 
@@ -101,13 +97,13 @@ public class Exit implements IStrategy {
         RefineryUtilities.centerFrameOnScreen( chart );
         chart.setVisible( true );
 
+        // write down to file and gui console starting line
         WriteToFile.writeDown(String.valueOf("\n" + TestMainRepeater.getMaActual_1()  + "\t\t" +getEquity()) + "\t\t" + orderCounter,true);
         TestMainRepeater.printToConsoleTextArea(
                 "\n" + TestMainRepeater.getMaActual_1()*10 +
                         "\t" + TestMainRepeater.getMaActual_2()*10 +
                         "\t" +getEquity() +
                         "\t" + orderCounter);
-        equityIndex = 1;
     }
 
     @Override
@@ -131,11 +127,10 @@ public class Exit implements IStrategy {
     private double [] MA_1;
     private double [] MA_2;
     private IOrder order = null;
-
     boolean ma1IsBiggerNew;
     boolean ma1IsBiggerOld;
     /* creating new orders logic */
-    public void newOrderLogic2(Instrument instrument) throws JFException {
+    public void newOrderLogic(Instrument instrument) throws JFException {
         IBar prevBar = history.getBar(instrument, period, OfferSide.BID, 1);
         MA_1 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
                 indicatorFilter, 3, prevBar.getTime(), 0);
@@ -148,22 +143,17 @@ public class Exit implements IStrategy {
         }else{
             ma1IsBiggerNew = false;
         }
+
         // load old value
-        if (MA_1[2] > MA_2[2]) {
-            ma1IsBiggerOld = true;
-        }else{
-            ma1IsBiggerOld = false;
-        }
+        if (MA_1[2] > MA_2[2]) { ma1IsBiggerOld = true; }
+        else{ ma1IsBiggerOld = false; }
 
         if(ma1IsBiggerNew != ma1IsBiggerOld){
-
             // SMA10 crossover SMA90 from UP to DOWN
             if (MA_1[0] < MA_2[0]) {
                 if (engine.getOrders().size() > 0) {
                     for (IOrder orderInMarket : engine.getOrders()) {
-                        if (orderInMarket.isLong()) {
                             orderInMarket.close();
-                        }
                     }
                 }
                 if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
@@ -176,9 +166,7 @@ public class Exit implements IStrategy {
             if (MA_1[0] > MA_2[0]) {
                 if (engine.getOrders().size() > 0) {
                     for (IOrder orderInMarket : engine.getOrders()) {
-                        if (orderInMarket.isLong()) {
                             orderInMarket.close();
-                        }
                     }
                 }
                 if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
@@ -186,46 +174,6 @@ public class Exit implements IStrategy {
                     submitOrder(OrderCommand.BUY);
                 }
                 ma1IsBiggerOld = true;
-            }
-
-        }
-    }
-
-    /* creating new orders logic */
-    public void newOrderLogic(Instrument instrument) throws JFException {
-        IBar prevBar = history.getBar(instrument, period, OfferSide.BID, 1);
-        MA_1 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_1,
-                indicatorFilter, 2, prevBar.getTime(), 0);
-        MA_2 = indicators.sma(instrument, period, OfferSide.BID, AppliedPrice.CLOSE, smaTimePeriod_2,
-                indicatorFilter, 2, prevBar.getTime(), 0);
-
-        // SMA10 crossover SMA90 from UP to DOWN
-        if ((MA_2[1] < MA_2[0]) && (MA_2[1] < MA_1[1]) && (MA_2[0] >= MA_1[0])) {
-            if (engine.getOrders().size() > 0) {
-                for (IOrder orderInMarket : engine.getOrders()) {
-                    if (orderInMarket.isLong()) {
-                        print("Closing Long position");
-                        orderInMarket.close();
-                    }
-                }
-            }
-            if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
-                print("Create SELL");
-                submitOrder(OrderCommand.SELL);
-            }
-        }
-        // SMA10 crossover SMA90 from DOWN to UP
-        if ((MA_2[1] > MA_2[0]) && (MA_2[1] > MA_1[1]) && (MA_2[0] <= MA_1[0])) {
-            if (engine.getOrders().size() > 0) {
-                for (IOrder orderInMarket : engine.getOrders()) {
-                    if (!orderInMarket.isLong()) {
-                        print("Closing Short position");
-                        orderInMarket.close();
-                    }
-                }
-            }
-            if ((order == null) || (!order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
-                submitOrder(OrderCommand.BUY);
             }
         }
     }
@@ -240,11 +188,11 @@ public class Exit implements IStrategy {
         long lastTickTime = history.getLastTick(instrument).getTime();
         String hour = sdf.format(lastTickTime);
 
+        // at 22 hours store balance
         if (hour.equals("22") && dailyChecker == false){
             dailyChecker = true;
             //System.out.println("Balance storing");
             Data.addDailyBalance(TestMainRepeater.getLoopCount(), account.getEquity());
-            equityIndex++;
         }else if (hour.equals("23")){
             dailyChecker = false;
         }
@@ -283,6 +231,7 @@ public class Exit implements IStrategy {
         }
     }
 
+    /** @return price of certain number of pip */
     private double getPipPrice(int pips) {
         return pips * instrument.getPipValue();
     }
@@ -306,7 +255,7 @@ public class Exit implements IStrategy {
         orderCounter++;
 
         // Submitting an order for the specified getInstrument at the current market price
-        return engine.submitOrder(getLabel(instrument), instrument, orderCmd, getAmount(), 0, 20, stopLossPrice, takeProfitPrice);
+        return engine.submitOrder(getLabel(instrument), instrument, orderCmd, getAmount(), 0, 20, 0, 0);
     }
 
     /** return amount of lots with a risk two percents */
@@ -328,7 +277,7 @@ public class Exit implements IStrategy {
         return lots;
     }
 
-    protected String getLabel(Instrument instrument) {
+    private String getLabel(Instrument instrument) {
         String label = instrument.name();
         label = label + (counter++);
         label = label.toUpperCase();

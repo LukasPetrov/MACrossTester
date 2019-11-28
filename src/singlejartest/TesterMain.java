@@ -70,6 +70,8 @@ public class TesterMain {
 
         LOGGER.info("Starting strategy");
 
+        Data.createDataCube();
+
         client.startStrategy(new Exit(TestMainRepeater.getMaActual_1(), TestMainRepeater.getMaActual_2(), false), getLoadingProgressListener());
         //now it's running
     }
@@ -147,7 +149,7 @@ public class TesterMain {
         Date dateTo = null;
         try {
             dateFrom = dateFormat.parse("01/01/2019 00:00:00");
-            dateTo = dateFormat.parse("01/03/2019 00:00:00");
+            dateTo = dateFormat.parse("01/10/2019 00:00:00");
         } catch (ParseException e) {
             e.printStackTrace();
         }
