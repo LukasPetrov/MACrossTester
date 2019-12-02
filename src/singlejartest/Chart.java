@@ -8,14 +8,19 @@ import org.jfree.ui.RefineryUtilities;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 public class Chart extends ApplicationFrame {
 
-    public Chart( String applicationTitle , String chartTitle ) {
-        super(applicationTitle);
+    public Chart( ) {
+        super("MATester");
         JFreeChart lineChart = ChartFactory.createLineChart(
-                chartTitle,
+                "strategies",
                 "Days","Balance",
-                createDataset(),
+                createDataset2(),
                 PlotOrientation.VERTICAL,
                 true,true,false);
 
@@ -34,6 +39,22 @@ public class Chart extends ApplicationFrame {
                 dataset.addValue(Data.getDailyBalance(strategy, day), "strategy_" + strategy, String.valueOf(day));
             }
         }
+        return dataset;
+    }
+    // show 15 max strategies
+    private DefaultCategoryDataset createDataset2( ) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+
+        try {
+            for (int strategy = 0; strategy < 15; strategy++) {
+                for (int day = 0; day < Data.getDailyBalance(Data.getBestResults(strategy)).size(); day++) {
+                    dataset.addValue(Data.getDailyBalance(Data.getBestResults(strategy), day), "strategy_" + Data.getBestResults(strategy), String.valueOf(day));
+                }
+            }
+        }catch(Exception e){
+
+        }
+
         return dataset;
     }
 }

@@ -28,6 +28,7 @@ public class Exit implements IStrategy {
     public int breakEvenPips = 25;
     private int smaTimePeriod_1;
     private int smaTimePeriod_2;
+    private String strategyName;
 
     public Exit(int smaTimePeriod_1, int smaTimePeriod_2, boolean GUITest){
         // smaTimePeriod1 must by smaller than 2
@@ -38,6 +39,10 @@ public class Exit implements IStrategy {
             this.smaTimePeriod_1 = smaTimePeriod_2 * 10;
             this.smaTimePeriod_2 = smaTimePeriod_1 * 10;
         }
+
+        // create strategy name
+        strategyName = smaTimePeriod_1*10 + "/" + smaTimePeriod_2*10;
+        Data.addStrategyName(strategyName);
 
         //  for GUI testing DataCube is not available
         if (!GUITest) {
@@ -91,18 +96,59 @@ public class Exit implements IStrategy {
             engine.getOrder(order.getLabel()).close();
         }
 
-        // show equity graph
-        Chart chart = new Chart("MATester", "strategies");
-        chart.pack( );
-        RefineryUtilities.centerFrameOnScreen( chart );
-        chart.setVisible( true );
+        // store final deposit
+        Data.addFinalDeposit(account.getEquity());
+
+        // show graph after last test
+        if (SMACrossListGenerator.getFinalNumber()-1 == TestMainRepeater.getLoopCount()) {
+
+
+            /** get list of certain number of the best strategies */
+            // create list of best results
+            Map<Double, Integer> strategies = new HashMap<>();
+            Data.getFinalDepositList();
+
+            ArrayList<Double> list = (ArrayList<Double>)Data.getFinalDepositList();
+            for(int i = 0; i < list.size(); i++){
+                strategies.put(Data.getFinalDeposit(i), i);
+            }
+
+
+            // sort list
+            SortedMap<Double, Integer> sortedCache = new TreeMap<>(Collections.reverseOrder());
+            sortedCache.putAll(strategies);
+
+            // store sorted list of best strategies to the Data
+            ArrayList<Integer> list2 =  new ArrayList<>(sortedCache.values());
+            for(int i = 0; i < sortedCache.size(); i++){
+                Data.addBestResultsIndex(list2.get(i));
+            }
+
+            strategies.forEach((x,y) -> System.out.println(x + "  " + y));
+            System.out.println("---------------------------------- SORTED ---------------------------------");
+            //print sorted list
+            ArrayList<Integer> list3 = (ArrayList<Integer>) Data.getBestResults();
+            list3.forEach((x) -> System.out.println(x+1 + " " + Data.getFinalDeposit(x) ));
+
+
+
+
+
+
+
+            // show equity graph
+            Chart chart = new Chart();
+            chart.pack();
+            RefineryUtilities.centerFrameOnScreen(chart);
+            chart.setVisible(true);
+        }
 
         // write down to file and gui console starting line
-        WriteToFile.writeDown(String.valueOf("\n" + TestMainRepeater.getMaActual_1()  + "\t\t" +getEquity()) + "\t\t" + orderCounter,true);
+        WriteToFile.writeDown(String.valueOf("\n" + TestMainRepeater.getMaActual_1() + "\t\t" + getEquity()) + "\t\t" + orderCounter, true);
         TestMainRepeater.printToConsoleTextArea(
-                "\n" + TestMainRepeater.getMaActual_1()*10 +
-                        "\t" + TestMainRepeater.getMaActual_2()*10 +
-                        "\t" +getEquity() +
+                "\n" + TestMainRepeater.getMaActual_1() * 10 +
+                        "\t" + TestMainRepeater.getMaActual_2() * 10 +
+                        "\t" + getEquity() +
                         "\t" + orderCounter);
     }
 

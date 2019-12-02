@@ -3,9 +3,7 @@ package singlejartest;
 import com.dukascopy.api.Instrument;
 import com.dukascopy.api.Period;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Create "DataCube" which is 3D field of array lists
@@ -29,6 +27,8 @@ public class Data {
     private static int inputInstrumentIndex;
     private static int inputPeriodIndex;
     private static int inputOpeningDepositIndex;
+    private static int bestResultsIndex2;
+    private static int bestResultsIndex;
 
     public static void createDataCube(){
         // int represents location at firstLevel ArrayList
@@ -42,7 +42,6 @@ public class Data {
         orderSizeIndex = 6;         addData1D(new ArrayList<ArrayList<Double>>());     // 6 order size
         orderCommisionIndex = 7;    addData1D(new ArrayList<ArrayList<Double>>());     // 7 order commission
 
-
         dateFromIndex = 8;              addData1D(new Date());          // 8 date from
         dateToIndex = 9;                addData1D(new Date());          // 9 date to
         inputMa_1Index = 10;            addData1D(new short[0]);        // 10 ma_1 from user input
@@ -50,6 +49,7 @@ public class Data {
         inputInstrumentIndex = 12;      addData1D(new Object());        // 12 instrument from user input
         inputPeriodIndex = 13;          addData1D(new Object());        // 13 period from user input
         inputOpeningDepositIndex = 14;  addData1D(new Object());        // 14 opening deposit from user input
+        bestResultsIndex = 15;          addData1D(new ArrayList<Integer>());     // 15 list of the best strategies <finalDeposit, index>
     }
 
     public static void addStrategyName(String name){
@@ -76,6 +76,9 @@ public class Data {
     public static void addOrderCommission(int strategyNumber, Double orderCommission){
         addData3D(orderCommisionIndex, strategyNumber, orderCommission);
     }
+    public static void addBestResultsIndex(int param){
+        addData2D(bestResultsIndex, param);
+    }
 
     public static void setDateFrom(Date dateFrom){
         setData1D(dateFromIndex, dateFrom);
@@ -95,13 +98,16 @@ public class Data {
     public static void setPeriod(Period period){
         setData1D(inputPeriodIndex, period);
     }
-    public static void setOpeningDeposit(int popeningDeposit){
-        setData1D(inputOpeningDepositIndex, popeningDeposit);
+    public static void setOpeningDeposit(int openingDeposit){
+        setData1D(inputOpeningDepositIndex, openingDeposit);
     }
 
 
     public static String getStrategyName(int strategyIndex){
         return getData(StrategyNameIndex, strategyIndex);
+    }
+    public static Object getStrategyName(){
+        return getData(StrategyNameIndex);
     }
     public static int getParam1(int strategyIndex){
         return getData(param1Index, strategyIndex);
@@ -111,6 +117,9 @@ public class Data {
     }
     public static Double getFinalDeposit(int strategyIndex){
         return getData(finalDepositIndex, strategyIndex);
+    }
+    public static Object getFinalDepositList(){
+        return getData(finalDepositIndex);
     }
     public static Double getDailyBalance(int strategyIndex, int dayIndex){
         return (Double) getData(dayliBalanceIndex, strategyIndex, dayIndex);
@@ -154,10 +163,22 @@ public class Data {
         return  getData(inputOpeningDepositIndex);
     }
 
+    public static int getBestResults(int strategyIndex){
+        return getData(bestResultsIndex, strategyIndex);
+    }
+    public static Object getBestResults(){
+        return getData(bestResultsIndex);
+    }
 
 
 
-    // return the value from position x, y, z
+    /**
+     * Return the value from position x, y, z.
+     *
+     * @param  x  1st Dimension
+     * @param  y  2nd Dimension
+     * @param  z  3th Dimension
+     */
     private static <T> T getData(int x, int y, int z){
 
         // load first level
@@ -172,7 +193,12 @@ public class Data {
         return value;
     }
 
-    // return the value from position x, y
+    /**
+     * Return the value from position x, y.
+     *
+     * @param  x  1st Dimension
+     * @param  y  2nd Dimension
+     */
     private static <T> T getData(int x, int y){
 
         // load first level
@@ -184,7 +210,12 @@ public class Data {
         return value;
     }
 
-    // return the value from position x, y
+
+    /**
+     * Return Object from position x.
+     *
+     * @param  x  1st Dimension
+     */
     private static Object  getData(int x){
 
         // load second value
@@ -193,7 +224,14 @@ public class Data {
         return value;
     }
 
-    // add the value to position x, y
+
+    /**
+     * Add the value to position x, y.
+     *
+     * @param  x  1st Dimension
+     * @param  y  2nd Dimension
+     * @param  value add this value
+     */
     private static void addData3D(int x, int y, Object value){
         //try if list exists if not (error) create new and then add new value
         try{
@@ -226,7 +264,13 @@ public class Data {
         }
     }
 
-    // add the value to position x
+
+    /**
+     * Add the value to position x.
+     *
+     * @param  x  1st Dimension
+     * @param  value add this value
+     */
     private static void addData2D(int x, Object value){
 
         // load first level
@@ -240,12 +284,22 @@ public class Data {
         firstLevel.set(x, secondLevel);
     }
 
-    // add new list 1D
+    /**
+     * Add new list.
+     *
+     * @param  list add this list
+     */
     private static void addData1D(Object list){
         firstLevel.add(list);
     }
 
-    // add new list 1D
+
+    /**
+     * Set/Replace list.
+     *
+     * @param  x 1st Dimension
+     * @param  list add this list
+     */
     private static void setData1D(int x, Object list){
         firstLevel.set(x, list);
     }
