@@ -4,14 +4,8 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class Chart extends ApplicationFrame {
 
@@ -34,9 +28,9 @@ public class Chart extends ApplicationFrame {
     private DefaultCategoryDataset createDataset( ) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
 
-        for (int strategy = 0; strategy < Data.getDailyBalance().size(); strategy++) {
-            for (int day = 0; day < Data.getDailyBalance(strategy).size(); day++) {
-                dataset.addValue(Data.getDailyBalance(strategy, day), "strategy_" + strategy, String.valueOf(day));
+        for (int strategy = 0; strategy < Data.getDailyEquity().size(); strategy++) {
+            for (int day = 0; day < Data.getDailyEquity(strategy).size(); day++) {
+                dataset.addValue(Data.getDailyEquity(strategy, day), "strategy_" + strategy, String.valueOf(day));
             }
         }
         return dataset;
@@ -46,9 +40,9 @@ public class Chart extends ApplicationFrame {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
 
         try {
-            for (int strategy = 0; strategy < 15; strategy++) {
-                for (int day = 0; day < Data.getDailyBalance(Data.getBestResults(strategy)).size(); day++) {
-                    dataset.addValue(Data.getDailyBalance(Data.getBestResults(strategy), day), "strategy_" + Data.getBestResults(strategy), String.valueOf(day));
+            for (int strategy = 0; strategy < 20; strategy++) {
+                for (int day = 0; day < Data.getDailyEquity(Data.getBestResults(strategy)).size(); day++) {
+                    dataset.addValue(Data.getDailyEquity(Data.getBestResults(strategy), day), Data.getStrategyName(Data.getBestResults(strategy)), String.valueOf(day));
                 }
             }
         }catch(Exception e){

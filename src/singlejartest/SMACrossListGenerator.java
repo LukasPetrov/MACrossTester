@@ -24,8 +24,8 @@ public class SMACrossListGenerator {
 
         int param1 = param1I;
         int param2 = param2I;
-        for (int A = 1; A <= param1; A++){
-            for (int B = 1; B <= param2; B++){
+        for (int A = param1I; A <= param2; A++){
+            for (int B = param1I; B <= param2; B++){
                 boolean zapis=true;
                 //            System.out.print("\n\n" + A + " " + B + "\t\t");
                 if (A != B){ // jen kdyz nejsou stejny
@@ -88,6 +88,6 @@ public class SMACrossListGenerator {
         return finalNumber;
     }
     public static void main(String[] arg) {
-        listOfParameters(20,20);
+        listOfParameters(5,8);
     }
 }

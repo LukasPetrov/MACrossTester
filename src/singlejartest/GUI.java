@@ -35,7 +35,7 @@ public class GUI {
         $$$setupUI$$$();
         f.add(panel1);
 
-        f.setSize(600, 600);
+        f.setSize(700, 1000);
         f.setVisible(true);
 
         startButton.addActionListener(new ActionListener() {
@@ -113,7 +113,13 @@ public class GUI {
                 // clean console text area
                 ConsoleTextArea.selectAll();
                 ConsoleTextArea.replaceSelection("");
-                ConsoleTextArea.append("MA 1\tMA 2\tFinal equity\tOrders");
+                ConsoleTextArea.append("" +
+                        "Name\t" +
+                        "Final Deposit\t" +
+                        "Success rate\t" +
+                        "Num Of Orders\t" +
+                        "Avrg commission\t" +
+                        "Avrg Duratin Of Order ");
 
                 // get list of parameters
                 TestMainRepeater.refreshListOfParameters();

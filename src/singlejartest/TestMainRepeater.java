@@ -193,7 +193,7 @@ public class TestMainRepeater {
         TestMainRepeater.openingDeposit = openingDeposit;
     }
 
-    public static int getLoopCount() {
+    public static int getLoopCounter() {
         return loopCount;
     }
 

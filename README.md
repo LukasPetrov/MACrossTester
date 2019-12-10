@@ -2,10 +2,24 @@
 
 ## method 1
 ##### cross = close old / create new order
-- rename strategy name at graph gui to param1/param2
 - GUI console change to table
 - store DataCube to binary file ?
-- orders are too big
+
+- ordercounter in exit is useless?
+
+````java
+//save
+FileOutputStream fos = new FileOutputStream("t.tmp");
+ObjectOutputStream oos = new ObjectOutputStream(fos);
+oos.writeObject(clubs);
+oos.close();
+
+//read
+FileInputStream fis = new FileInputStream("t.tmp");
+ObjectInputStream ois = new ObjectInputStream(fis);
+List<Club> clubs = (List<Club>) ois.readObject();
+ois.close();
+````
 
 
 ## method 2 
@@ -18,7 +32,7 @@
 
 
 ## Was is das ? (GUI)
-```java
+````java
 TestMainRepeater.getListOfParameters();
-```
+````
 

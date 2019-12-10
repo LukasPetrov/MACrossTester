@@ -1,5 +1,6 @@
 package singlejartest;
 
+import com.dukascopy.api.IOrder;
 import com.dukascopy.api.Instrument;
 import com.dukascopy.api.Period;
 
@@ -15,7 +16,7 @@ public class Data {
     private static int param1Index;
     private static int param2Index;
     private static int finalDepositIndex;
-    private static int dayliBalanceIndex;
+    private static int dailyEquityIndex;
     private static int orderNameIndex;
     private static int orderSizeIndex;
     private static int orderCommisionIndex;
@@ -27,8 +28,8 @@ public class Data {
     private static int inputInstrumentIndex;
     private static int inputPeriodIndex;
     private static int inputOpeningDepositIndex;
-    private static int bestResultsIndex2;
     private static int bestResultsIndex;
+    private static int ordersIndex;
 
     public static void createDataCube(){
         // int represents location at firstLevel ArrayList
@@ -36,7 +37,7 @@ public class Data {
         param1Index = 1;            addData1D(new ArrayList<Integer>());               // 1 param 1
         param2Index = 2;            addData1D(new ArrayList<Integer>());               // 2 param 2
         finalDepositIndex = 3;      addData1D(new ArrayList<Double>());                // 3 final deposit
-        dayliBalanceIndex = 4;      addData1D(new ArrayList<ArrayList<Double>>());     // 4 daily balance
+        dailyEquityIndex = 4;      addData1D(new ArrayList<ArrayList<Double>>());     // 4 daily equity
 
         orderNameIndex = 5;         addData1D(new ArrayList<ArrayList<String>>());     // 5 order name
         orderSizeIndex = 6;         addData1D(new ArrayList<ArrayList<Double>>());     // 6 order size
@@ -49,7 +50,8 @@ public class Data {
         inputInstrumentIndex = 12;      addData1D(new Object());        // 12 instrument from user input
         inputPeriodIndex = 13;          addData1D(new Object());        // 13 period from user input
         inputOpeningDepositIndex = 14;  addData1D(new Object());        // 14 opening deposit from user input
-        bestResultsIndex = 15;          addData1D(new ArrayList<Integer>());     // 15 list of the best strategies <finalDeposit, index>
+        bestResultsIndex = 15;          addData1D(new ArrayList<Integer>());     // 15 list of the best strategies
+        ordersIndex = 16;               addData1D(new ArrayList<ArrayList<IOrder>>());     // 16 list of all orders
     }
 
     public static void addStrategyName(String name){
@@ -64,8 +66,8 @@ public class Data {
     public static void addFinalDeposit(Double deposit){
         addData2D(finalDepositIndex, deposit);
     }
-    public static void addDailyBalance(int strategyNumber,  Double balance){
-        addData3D(dayliBalanceIndex, strategyNumber, balance);
+    public static void addDailyEquity(int strategyNumber, Double balance){
+        addData3D(dailyEquityIndex, strategyNumber, balance);
     }
     public static void addOrderName(int strategyNumber, String orderName){
         addData3D(orderNameIndex, strategyNumber, orderName);
@@ -78,6 +80,9 @@ public class Data {
     }
     public static void addBestResultsIndex(int param){
         addData2D(bestResultsIndex, param);
+    }
+    public static void addOrder(int strategy, IOrder order){
+        addData3D(ordersIndex, strategy, order);
     }
 
     public static void setDateFrom(Date dateFrom){
@@ -121,14 +126,14 @@ public class Data {
     public static Object getFinalDepositList(){
         return getData(finalDepositIndex);
     }
-    public static Double getDailyBalance(int strategyIndex, int dayIndex){
-        return (Double) getData(dayliBalanceIndex, strategyIndex, dayIndex);
+    public static Double getDailyEquity(int strategyIndex, int dayIndex){
+        return (Double) getData(dailyEquityIndex, strategyIndex, dayIndex);
     }
-    public static List getDailyBalance(int strategy){
-        return (List) getData(dayliBalanceIndex, strategy);
+    public static List getDailyEquity(int strategy){
+        return (List) getData(dailyEquityIndex, strategy);
     }
-    public static List getDailyBalance(){
-        return (List) getData(dayliBalanceIndex);
+    public static List getDailyEquity(){
+        return (List) getData(dailyEquityIndex);
     }
     public static String getOrderName(int strategyIndex, int orderIndex){
         return getData(orderNameIndex, strategyIndex, orderIndex);
@@ -168,6 +173,9 @@ public class Data {
     }
     public static Object getBestResults(){
         return getData(bestResultsIndex);
+    }
+    public static ArrayList<IOrder> getOrders(int strategy){
+        return (ArrayList<IOrder>) getData(ordersIndex, strategy);
     }
 
 

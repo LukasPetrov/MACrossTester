@@ -4,6 +4,8 @@ import com.dukascopy.api.*;
 import com.dukascopy.api.IEngine.OrderCommand;
 import com.dukascopy.api.IIndicators.AppliedPrice;
 import org.jfree.ui.RefineryUtilities;
+
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -81,11 +83,10 @@ public class Exit implements IStrategy {
             return;
 
         newOrderLogic(instrument);
-
+        //Data.getOrders(0);
         //setBreakEvent();
 
         storeEquity(instrument);
-
 
     }
 
@@ -94,14 +95,14 @@ public class Exit implements IStrategy {
         // close all orders
         for (IOrder order : engine.getOrders()) {
             engine.getOrder(order.getLabel()).close();
+            //Data.addOrder(TestMainRepeater.getLoopCounter(), order);
         }
 
         // store final deposit
         Data.addFinalDeposit(account.getEquity());
 
         // show graph after last test
-        if (SMACrossListGenerator.getFinalNumber()-1 == TestMainRepeater.getLoopCount()) {
-
+        if (SMACrossListGenerator.getFinalNumber()-1 == TestMainRepeater.getLoopCounter()) {
 
             /** get list of certain number of the best strategies */
             // create list of best results
@@ -143,13 +144,37 @@ public class Exit implements IStrategy {
             chart.setVisible(true);
         }
 
+        //get correct number of valid orders
+        int numOfOrders = 0;
+        int profitOrders = 0;
+        int lossOrders = 0;
+        double avrgCommission=0;
+        for (IOrder order: Data.getOrders(TestMainRepeater.getLoopCounter())) {
+            if (order.getState().name() == "CLOSED" || order.getState().name() == "FILLED"){
+                numOfOrders++;
+                avrgCommission += order.getCommissionInUSD();
+            }
+            if (order.getProfitLossInUSD() > 0)
+                lossOrders++;
+            if (order.getProfitLossInUSD() < 0)
+                profitOrders++;
+        }
+
+
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        String successRate = df.format((double)profitOrders/((double)numOfOrders/100));
+        avrgCommission = Double.parseDouble(df.format(avrgCommission/numOfOrders));
+
         // write down to file and gui console starting line
         WriteToFile.writeDown(String.valueOf("\n" + TestMainRepeater.getMaActual_1() + "\t\t" + getEquity()) + "\t\t" + orderCounter, true);
         TestMainRepeater.printToConsoleTextArea(
-                "\n" + TestMainRepeater.getMaActual_1() * 10 +
-                        "\t" + TestMainRepeater.getMaActual_2() * 10 +
+                "\n" + Data.getStrategyName(TestMainRepeater.getLoopCounter()) +
                         "\t" + getEquity() +
-                        "\t" + orderCounter);
+                        "\t" + successRate + "%" +
+                        "\t" + numOfOrders +
+                        "\t" + avrgCommission
+        );
     }
 
     @Override
@@ -199,7 +224,8 @@ public class Exit implements IStrategy {
             if (MA_1[0] < MA_2[0]) {
                 if (engine.getOrders().size() > 0) {
                     for (IOrder orderInMarket : engine.getOrders()) {
-                            orderInMarket.close();
+                        //Data.addOrder(TestMainRepeater.getLoopCounter(), orderInMarket);
+                        orderInMarket.close();
                     }
                 }
                 if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
@@ -212,7 +238,8 @@ public class Exit implements IStrategy {
             if (MA_1[0] > MA_2[0]) {
                 if (engine.getOrders().size() > 0) {
                     for (IOrder orderInMarket : engine.getOrders()) {
-                            orderInMarket.close();
+                        //Data.addOrder(TestMainRepeater.getLoopCounter(), orderInMarket);
+                        orderInMarket.close();
                     }
                 }
                 if ((order == null) || (order.isLong() && order.getState().equals(IOrder.State.CLOSED)) ) {
@@ -238,7 +265,7 @@ public class Exit implements IStrategy {
         if (hour.equals("22") && dailyChecker == false){
             dailyChecker = true;
             //System.out.println("Balance storing");
-            Data.addDailyBalance(TestMainRepeater.getLoopCount(), account.getEquity());
+            Data.addDailyEquity(TestMainRepeater.getLoopCounter(), getEquity());
         }else if (hour.equals("23")){
             dailyChecker = false;
         }
@@ -298,10 +325,13 @@ public class Exit implements IStrategy {
             takeProfitPrice = history.getLastTick(instrument).getAsk() - getPipPrice(takeProfitPips);
         }
 
+        IOrder order = engine.submitOrder(getLabel(instrument), instrument, orderCmd, getAmount(), 0, 20, 0, 0);
+        Data.addOrder(TestMainRepeater.getLoopCounter(), order);
+
         orderCounter++;
 
         // Submitting an order for the specified getInstrument at the current market price
-        return engine.submitOrder(getLabel(instrument), instrument, orderCmd, getAmount(), 0, 20, 0, 0);
+        return order;
     }
 
     /** return amount of lots with a risk two percents */
